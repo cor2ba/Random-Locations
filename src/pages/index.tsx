@@ -15,6 +15,7 @@ const HomePage = () => {
   const [coordinates, setCoordinates] = useState<Array<{lat: number, lng: number}>>([]);
   const [quantity, setQuantity] = useState<number>(1);
   const [selectedLocation, setSelectedLocation] = useState<{lat: number, lng: number} | null>(null);
+  const [showAllLocations, setShowAllLocations] = useState(false);
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
@@ -28,7 +29,7 @@ const HomePage = () => {
   const generateRandomCoordinates = () => {
     const newCoordinates = [];
     for (let i = 0; i < quantity; i++) {
-      const lat = Math.random() * 180 - 90;
+      const lat = Math.random() * 170 - 85;
       const lng = Math.random() * 360 - 180;
       newCoordinates.push({
         lat: parseFloat(lat.toFixed(6)),
@@ -98,6 +99,17 @@ const HomePage = () => {
             >
               Generar Ubicaciones
             </button>
+            {coordinates.length > 0 && (
+              <button
+                onClick={() => setShowAllLocations(true)}
+                className="px-6 py-3 bg-gray-800 hover:bg-gray-700 rounded-xl text-lg font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500/50 flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                </svg>
+                Ver Todas las Ubicaciones
+              </button>
+            )}
           </div>
 
           {coordinates.length > 0 && (
@@ -185,6 +197,17 @@ const HomePage = () => {
                         streetViewControl: true,
                         mapTypeControl: false,
                         fullscreenControl: true,
+                        minZoom: 2,
+                        maxZoom: 18,
+                        restriction: {
+                          latLngBounds: {
+                            north: 85,
+                            south: -85,
+                            west: -180,
+                            east: 180,
+                          },
+                          strictBounds: true
+                        },
                         styles: [
                           {
                             featureType: "all",
@@ -210,6 +233,84 @@ const HomePage = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                       </svg>
                     </a>
+                  </div>
+                </div>
+              </motion.div>
+            </>
+          )}
+          {showAllLocations && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+                onClick={() => setShowAllLocations(false)}
+              />
+              <motion.div
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                className="fixed inset-0 w-full h-full bg-gray-900/95 z-50"
+              >
+                <div className="h-full p-6 flex flex-col max-w-7xl mx-auto">
+                  <div className="flex justify-between items-center mb-6">
+                    <div className="space-y-1">
+                      <h3 className="text-2xl font-bold text-white">
+                        Todas las Ubicaciones
+                      </h3>
+                      <p className="text-gray-400">
+                        {coordinates.length} ubicaciones encontradas
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setShowAllLocations(false)}
+                      className="p-2 hover:bg-gray-800 rounded-xl transition-colors"
+                    >
+                      <svg className="w-6 h-6 text-gray-400 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                  
+                  <div className="flex-1 rounded-2xl overflow-hidden shadow-2xl">
+                    <GoogleMap
+                      mapContainerStyle={{
+                        width: '100%',
+                        height: '100%',
+                      }}
+                      center={coordinates[0]}
+                      zoom={2}
+                      options={{
+                        zoomControl: true,
+                        streetViewControl: true,
+                        mapTypeControl: false,
+                        fullscreenControl: true,
+                        minZoom: 2,
+                        maxZoom: 18,
+                        restriction: {
+                          latLngBounds: {
+                            north: 85,
+                            south: -85,
+                            west: -180,
+                            east: 180,
+                          },
+                          strictBounds: true
+                        }
+                      }}
+                    >
+                      {coordinates.map((coord, index) => (
+                        <Marker
+                          key={index}
+                          position={coord}
+                          label={{
+                            text: `${index + 1}`,
+                            color: 'white',
+                            className: 'font-bold'
+                          }}
+                        />
+                      ))}
+                    </GoogleMap>
                   </div>
                 </div>
               </motion.div>
