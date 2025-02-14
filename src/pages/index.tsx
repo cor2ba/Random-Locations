@@ -13,11 +13,11 @@ const geistSans = Geist({
 
 const HomePage = () => {
   const [coordinates, setCoordinates] = useState<Array<{lat: number, lng: number}>>([]);
-  const [quantity, setQuantity] = useState<number>(1);
+  const [quantity, setQuantity] = useState<number>(10);
   const [selectedLocation, setSelectedLocation] = useState<{lat: number, lng: number} | null>(null);
   const [showAllLocations, setShowAllLocations] = useState(false);
 
-  const { isLoaded, loadError } = useLoadScript({
+  const { loadError } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
     libraries: libraries,
   });
@@ -39,17 +39,10 @@ const HomePage = () => {
     setCoordinates(newCoordinates);
   };
 
-  const mapContainerStyle = {
-    width: '100%',
-    height: '400px'
-  };
-
-  console.log('API Key:', process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY);
 
   return (
     <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''} libraries={libraries}>
       <div className={`h-screen overflow-hidden bg-[#0A0F1C] relative ${geistSans.variable} font-sans`}>
-        {/* Efectos de fondo mejorados */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(17,24,39,0.8),rgba(0,0,0,0)_70%)]" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(59,130,246,0.1),transparent_35%)] animate-pulse" />
@@ -63,7 +56,6 @@ const HomePage = () => {
           transition={{ duration: 0.8 }}
           className="relative h-screen max-w-4xl mx-auto p-8 text-white flex flex-col"
         >
-          {/* Header mejorado */}
           <div className="text-center space-y-6 mb-12">
             <motion.h1 
               initial={{ opacity: 0, y: -20 }}
